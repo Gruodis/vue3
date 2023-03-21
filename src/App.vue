@@ -13,15 +13,36 @@ which can be accessed and modified like a normal JavaScript variable.
 -->
 
 <script setup>
+// Composition API Solution
+import { ref } from "vue";
 const count = ref(0); //define state with "ref" and invoke with "()", "ref()" - state defined and invoked
 
-const substractFromCount = () => {
+const subtractFromCount = () => {
   count.value = count.value + 1;
 }
 const addToCount = () => {
   count.value = count.value + 1;
 }
 </script>
+<script>
+// Options API Solution
+// export default {
+//   data() {
+//     return {
+//       count: 0
+//     };
+//   },
+//   methods: {
+//     subtractFromCount() {
+//       this.count--;
+//     },
+//     addToCount() {
+//       this.count++;
+//     }
+//   }
+// };
+</script>
+
 
 <template>
     <main>
@@ -30,11 +51,12 @@ const addToCount = () => {
             <h2 class="counter-num">{{ count }}</h2>
 
             <div class="buttons-container">
-              <button id="minus" @click="substractFromCount">-</button>
+              <button id="minus" @click="subtractFromCount">-</button>
               <button id="plus" @click="addToCount">+</button>
-<!--                <button id="minus" @click="count&#45;&#45;">-</button>
+<!--
+                <button id="minus" @click="count&#45;&#45;">-</button>
                 <button id="plus" @click="count++">+</button>
-                -->
+-->
             </div>
         </div>
     </main>
