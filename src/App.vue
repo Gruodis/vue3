@@ -13,69 +13,172 @@ which can be accessed and modified like a normal JavaScript variable.
 -->
 
 <script setup>
+// generate random light color
+function getRandomColor() {
+  const color = "hsl(" + Math.random() * 360 + ", 80%, 75%)";
+  return color;
+}
+
 // Composition API Solution
 import { ref } from "vue";
-const count = ref(0); //define state with "ref" and invoke with "()", "ref()" - state defined and invoked
+const showModal = ref(false)
 
-const subtractFromCount = () => {
-  count.value = count.value + 1;
-}
-const addToCount = () => {
-  count.value = count.value + 1;
-}
-</script>
-<script>
-// Options API Solution
-// export default {
-//   data() {
-//     return {
-//       count: 0
-//     };
-//   },
-//   methods: {
-//     subtractFromCount() {
-//       this.count--;
-//     },
-//     addToCount() {
-//       this.count++;
-//     }
-//   }
-// };
-</script>
+const newNote = ref('') // for two way binding, state = '' = empty
+const notes = ref([]) // empty array to store notes
 
+
+let storeId = ref(101);
+const errorMsg = ref("");
+const addNote = () => {
+  // Check if text is entered
+  if(newNote.value.length < 10) {
+    return errorMsg.value = "Text must be 10 character at least, now is: ";
+  }
+  // push object to array "notes"
+  notes.value.push({
+    id: storeId.value++,
+    text: newNote.value,
+    date: new Date(),
+    bgColor: getRandomColor()
+  })
+  showModal.value = false;
+  newNote.value = "";
+  errorMsg.value = "";
+}
+
+</script>
 
 <template>
-    <main>
-        <div class="text-32px">
-            <h1>Counter with Vue3</h1>
-            <h2 class="counter-num">{{ count }}</h2>
+  <main>
+    <div v-if="showModal" class="overlay" @click="showModal = false">
 
-            <div class="buttons-container">
-              <button id="minus" @click="subtractFromCount">-</button>
-              <button id="plus" @click="addToCount">+</button>
-<!--
-                <button id="minus" @click="count&#45;&#45;">-</button>
-                <button id="plus" @click="count++">+</button>
--->
-            </div>
+      <!--  prevent the click event from propagating  -->
+      <div class="modal text-black"  @click.stop>
+        <p @click="showModal = false">x</p>
+        <span>{{newNote}}</span>
+
+        <!--  Two way binding with v-model and remove unused spaces with "trim" -->
+        <textarea v-model.trim="newNote"/>
+
+        <p v-if="errorMsg" class="text-red-400 my-5 !text-14px"> {{ errorMsg }} </p>
+        <button @click="addNote">Add Note</button>
+      </div>
+    </div>
+    <div class="container">
+      <header>
+        <h1>Notes {{ storeId - 101 }}</h1>
+        <button @click="showModal = true">+</button>
+      </header>
+      <div class="cards-container">
+        <!--  iterate through array "notes" to display each note -->
+        <div v-for="note in notes" :key="note.id" class="card text-black" :style="{backgroundColor: note.bgColor}">
+          <p class="main-text">{{ note.id }}</p>
+          <p class="main-text">{{ note.text }}</p>
+          <p class="date">{{ note.date.toLocaleDateString("lt-LT") }}</p>
         </div>
-    </main>
+      </div>
+    </div>
+  </main>
 </template>
 
 <style scoped>
-.counter-num {
-    text-align: center;
-    margin: 1em 0;
+.container {
+  max-width: 1000px;
+  padding: 10px;
+  margin: 0 auto
 }
-
-.buttons-container {
-    display: flex;
-    justify-content: center;
-    gap: 2em;
+h1 {
+  font-weight: bold;
+  margin-bottom: 25px;
+  font-size: 75px;
 }
-
-.buttons-container button {
-    padding: 6px 12px;
-    @apply bg-amber-600;
+.card {
+  width: 225px;
+  height: 225px;
+  padding: 10px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+.main-text {
+  line-height: 1.25;
+  font-size: 17.5px;
+  font-weight: bold;
+}
+.date {
+  font-size: 12.5px;
+  margin-top: auto;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+header button {
+  border: none;
+  padding: 10px;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  background-color: rgb(21, 20, 20);
+  border-radius: 1000px;
+  color: white;
+  font-size: 20px;
+}
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.77);
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+main {
+  height: 100vh;
+  width: 100vw;
+  align-items: flex-start;
+}
+.modal {
+  width: 750px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 30px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.modal button {
+  padding: 10px 20px;
+  font-size: 20px;
+  width: 100%;
+  background-color: blueviolet;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin-top: 15px;
+}
+.modal p {
+  margin-left: auto;
+  font-size: 20px;
+  z-index: 100000;
+  cursor: pointer;
+}
+textarea {
+  width: 100%;
+  height: 200px;
+  padding: 5px;
+  font-size: 20px;
 }
 </style>
