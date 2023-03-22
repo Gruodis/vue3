@@ -1,244 +1,100 @@
-<!--
-
-Create click counter with Vue3
-
-In Vue 3, the "ref" function is used to create a reactive reference,
-which is an object that contains a single mutable value.
-The ref function takes an initial value as its argument and returns an object with a value property that contains the initial value.
-
-In your code, the line const count = ref(0);
-creates a reactive reference called count with an initial value of 0.
-The count object contains a single property called value,
-which can be accessed and modified like a normal JavaScript variable.
--->
-
 <script setup>
-// generate random light color function
-function getRandomColor() {
-    return "hsl(" + Math.random() * 360 + ", 80%, 75%)";
-}
+// import Json data
+import q from "./data/quizes.json";
 
-// Composition API Solution
-import { ref, watch } from "vue"; //export functions from Vue as you need them
+// In Vue 3, ref is a function that creates a reactive reference to a value,
+// which can be used in the template and in the JavaScript logic of a Vue component.
+import { ref, watch } from "vue";
+import Card from "./components/Card.vue";
 
-const showModal = ref(false); //declare showModal boolean state
+// if you want to modify or update the q data in your Vue component and have those changes be reactive,
+// then you would need to create a ref(q).
+const quizzes = ref(q);
 
-const newNote = ref(""); //declare newNote state = '' = empty
-const notes = ref([]); //declare empty array to store notes
+const search = ref("");
 
-let storeId = ref(101); //declare storeId with default num value
+// constantly watch for changes in search field
+// This part of the code is a Vue 3 setup script
+// that defines a reactive data variable named quizzes using the ref function.
+// The quizzes variable is initially set to the
+// value of a JSON object q imported from a file named quizes.json.
 
-//watch for changes in newNote and invoke function checkError
-watch(newNote, () => {
-    checkError();
-});
+// The script also defines another reactive variable named search using the ref function,
+// which represents a search query input by the user in the frontend.
+// The watch function is used to monitor any changes to the search variable,
+// and update the quizzes variable accordingly.
 
-//declare function addNote to store object with properties
-const addNote = () => {
-    // Check if text is entered
-    if (newNote.value.length < 10) {
-        return;
-    }
-    // push object to array "notes"
-    notes.value.push({
-        id: storeId.value++,
-        text: newNote.value,
-        date: new Date(),
-        bgColor: getRandomColor(),
-    });
+// The magic happens in the watch function,
+// which executes a filtering function on the q data and assigns the filtered result to the quizzes variable using quizzes.value.
+// Specifically, the filtering function uses the filter method on the q array,
+// which creates a new array of all the elements that pass a certain condition.
 
+// In this case, the condition is a callback function that checks if
+// the name property of each quiz object in the q array contains
+// the value of the search variable as a substring (ignoring case sensitivity).
+// If a quiz object meets this condition, it is included in the new array assigned to quizzes.
 
-  notes.value.forEach(note => {
-    console.log("#" + note.id, note.text);
-  });
+// By assigning the filtered result to quizzes.value,
+// the Vue reactive system detects the change in the value of quizzes
+// and updates any components that use this variable in their template or JavaScript logic,
+// re-rendering them with the new filtered data.
+// This allows for a dynamic and reactive user interface that responds to user input in real time.
+watch(search, () => {
+  console.log(`woooo`);
 
-    //clear states
-    showModal.value = false;
-    newNote.value = "";
-    errorMsg.value = "";
-    disableBtn.value = true;
-};
+  quizzes.value = q.filter(
+      // This is a callback function used as an argument
+      // to the filter() method. It takes an argument quiz,
+      // which represents a single object in the q array.
+      quiz => quiz.name
+          .toLowerCase()
+          .includes(
+              search.value.toLowerCase()
+          )
+      // The function uses the toLowerCase() method to convert the name property of the quiz object to lowercase,
+      // and then checks if the lowercase name property includes the lowercase value of the search variable as a substring.
 
-
-const errorMsg = ref("");
-const disableBtn = ref(true);
-
-// declare isError with default value - true
-let isError = ref(true);
-
-//declare function checkError
-const checkError = () => {
-  //change isError true/false depending on number of characters entered in textarea
-  isError = newNote.value.length < 10;
-  console.log(isError);
-
-  errorMsg.value = isError ? `Text must be 10 characters at least, now is: ${newNote.value.length}` : ``;
-
-  // check docs for conditional classes to solve this:
-  // errorClass.value = isError ? 'text-red-400' : 'text-green-600';
-  // disableClass.value = isError ? 'bg-gray-300 bg-opacity-50 pointer-event' : '';
-
-  disableBtn.value = isError;
-};
-
-//invoke checkError function on first run
-checkError();
+      // If the name property of the quiz object contains the search query (ignoring case sensitivity),
+      // then the function returns true,
+      // and the quiz object is included in the filtered result.
+      // If not, the function returns false, and the quiz object is excluded from the filtered result.
+  )
+})
 </script>
-
 <template>
-    <main>
-        <div v-if="showModal" class="overlay" @click="showModal = false">
-            <!--  @click.stop prevent the click event from propagating  -->
-            <div class="modal text-black" @click.stop>
-                <!--  Close modal on click -->
-                <p @click="showModal = false">x</p>
-
-                <span :class="{ 'text-red-400': isError, 'text-green-500': !isError }"
-                    >{{ newNote }} {{ errorMsg }}</span
-                >
-
-                <!--  Two way binding with v-model and remove unused spaces with "trim" -->
-                <textarea v-model.trim="newNote" />
-
-                <!--  Error message -->
-                <div class="min-h-[24px] my-5 text-right">
-                    <p :class="{ 'text-red-400 !text-14px': isError, 'text-green-500': !isError }">
-                        {{ errorMsg }}
-                    </p>
-                </div>
-
-                <!--  Submit button -->
-                <button
-                    :class="{ 'bg-gray-300 bg-opacity-50': isError, '': !isError }"
-                    @click="addNote"
-                    :disabled="isError"
-                >
-                    Add Note
-                </button>
+    <div class="container">
+        <!--      {{q}}-->
+        <header>
+            <div>
+                <h1>Quiz App</h1>
+                <span class="mt-3 text-18px text-gray-50"> Our Quiz has {{ q.length }} categories to choose from </span>
             </div>
-        </div>
 
-        <!--  Display notes from array -->
-        <div class="container">
-            <header>
-                <h1>Notes {{ storeId - 101 }}</h1>
-                <button class="hover:bg-blue-500" @click="showModal = true">+</button>
-            </header>
-            <div class="cards-container">
-                <!--  iterate through array "notes" to display each note -->
-                <div
-                    v-for="note in notes"
-                    :key="note.id"
-                    class="card text-black"
-                    :style="{ backgroundColor: note.bgColor }"
-                >
-                    <p class="text-22px font-semibold">#{{ note.id }}</p>
-                    <p class="main-text">{{ note.text }}</p>
-                    <p class="date">{{ note.date.toLocaleDateString("lt-LT") }}</p>
-                </div>
-            </div>
+            <!--  use v-model to add two way binding with default value Empty string from previously declared variable -->
+            <input v-model="search" type="text" placeholder="Search for Quiz.." />
+        </header>
+
+        <!--      Cards container-->
+        <div class="options-container">
+          <Card v-for="quiz in quizzes" :key="quiz.id" :quiz="quiz" />
         </div>
-    </main>
+    </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .container {
-    max-width: 1000px;
-    padding: 10px;
-    margin: 0 auto;
-}
-h1 {
-    font-weight: bold;
-    margin-bottom: 25px;
-    font-size: 75px;
-}
-.card {
-    width: 225px;
-    height: 225px;
-    padding: 10px;
-    border-radius: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    margin-right: 20px;
-    margin-bottom: 20px;
-}
-.main-text {
-    @apply text-16px;
-}
-.date {
-    @apply text-12px;
-    margin-top: auto;
-}
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-header button {
-    border: none;
-    padding: 10px;
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
-    background-color: rgb(21, 20, 20);
-    border-radius: 1000px;
-    color: white;
-    font-size: 20px;
-}
-.cards-container {
-    display: flex;
-    flex-wrap: wrap;
-}
-.overlay {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.77);
-    transform: translate(-50%, -50%);
-    top: 50%;
-    left: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-}
-main {
-    height: 100vh;
-    width: 100vw;
-    align-items: flex-start;
-}
-.modal {
-    width: 750px;
-    background-color: white;
-    border-radius: 10px;
-    padding: 30px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-}
-.modal button {
-    padding: 10px 20px;
-    font-size: 20px;
-    width: 100%;
-    border: none;
-    @apply text-gray-500;
-}
-.modal button:not([disabled]) {
-    background-color: blueviolet;
-    color: white;
-    cursor: pointer;
-}
-.modal p {
-    margin-left: auto;
-    font-size: 20px;
-    z-index: 100000;
-    cursor: pointer;
-}
-textarea {
-    width: 100%;
-    height: 200px;
-    padding: 5px;
-    font-size: 20px;
+    @apply max-w-[1000px] mx-auto my-12 #{!important};
+    header {
+        @apply flex items-center my-5 justify-between;
+        h1 {
+            @apply font-semibold text-gray-50 text-5xl drop-shadow;
+        }
+        input {
+            @apply rounded py-2 px-2.5;
+        }
+    }
+  .options-container {
+    @apply grid grid-cols-3 gap-3;
+  }
 }
 </style>
