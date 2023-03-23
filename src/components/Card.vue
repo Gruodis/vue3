@@ -1,6 +1,5 @@
 <script setup>
-import { defineProps, ref, watch } from "vue";
-import q from "@/data/quizes.json";
+import { defineProps } from "vue";
 
 const { quiz } = defineProps(["quiz"]);
 </script>
