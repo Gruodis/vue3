@@ -1,13 +1,14 @@
 // Define routing rules
 
-import {createRouter, createWebHistory} from "vue-router"
+import { createRouter, createWebHistory } from "vue-router";
 
 // import pages
-import HomePage from "../views/HomePage.vue";
-import AboutPage from "../views/AboutPage.vue"
+// import HomePage from "../views/HomePage.vue";
+import AboutPage from "../views/AboutPage.vue";
 import QuizPage from "../views/QuizPage.vue";
 import QuestionsPage from "../views/QuestionsPage.vue";
 import NotFound from "../views/404Page.vue";
+import QuizList from "../views/QuizList.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,7 +18,7 @@ const router = createRouter({
         {
             path: "/", // root directory
             name: "home",
-            component: HomePage // page template for path
+            component: QuizList, // page template for path
         },
         {
             path: "/home", // redirect to root if url is "/home"
@@ -26,28 +27,27 @@ const router = createRouter({
         {
             path: "/about", // directory
             name: "about",
-            component: AboutPage // page template for path
+            component: AboutPage, // page template for path
         },
 
         // dynamic links
         {
-            path: '/quiz/:id',
+            path: "/quiz/:id",
             name: "quiz",
             component: QuizPage,
             children: [
                 {
                     path: "questions",
-                    component: QuestionsPage
-                }
-            ]
+                    component: QuestionsPage,
+                },
+            ],
         },
         {
             path: "/:catchall(.*)*",
             name: "Not Found",
-            component: NotFound
-        }
+            component: NotFound,
+        },
+    ],
+});
 
-    ]
-})
-
-export default router
+export default router;

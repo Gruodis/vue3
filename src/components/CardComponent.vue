@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps } from "vue";
-import {RouterLink} from "vue-router"
-const { quiz } = defineProps(["quiz"]);
+import { RouterLink } from "vue-router";
+const props = defineProps(["quiz"]);
 </script>
 
 <template>
@@ -14,11 +14,11 @@ const { quiz } = defineProps(["quiz"]);
         <img :src="quiz.img" alt="" />
 
         <div class="card-text">
-          <RouterLink :to="`/quiz/${quiz.id}`">
-            <h2 class="title">{{ quiz.name }}</h2>
-          </RouterLink>
+            <RouterLink :to="`/quiz/${props.quiz.id}`">
+                <h2 class="title">{{ props.quiz.name }}</h2>
+            </RouterLink>
             <p>
-                {{ quiz.questions.length }}
+                {{ props.quiz.questions.length }}
             </p>
         </div>
     </div>

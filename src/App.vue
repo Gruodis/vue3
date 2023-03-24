@@ -1,20 +1,24 @@
 <script setup>
 // import Json data
-import q from "./data/quizes.json";
+import data from "./data/quizes.json";
 
 // import page
 import { RouterView } from "vue-router";
 
 // In Vue 3, ref is a function that creates a reactive reference to a value,
 // which can be used in the template and in the JavaScript logic of a Vue component.
-import { ref, watch } from "vue";
-import Card from "./components/Card.vue";
-import Navigation from "./components/Navigation.vue";
+import { ref, watch, computed } from "vue";
+
+import Navigation from "./components/NavigationComponent.vue";
 
 // if you want to modify or update the q data in your Vue component and have those changes be reactive,
 // then you would need to create a ref(q).
-const quizzes = ref(q);
+const quizzes = ref(data);
 
+// computed property to determine current URL
+const isRootUrl = computed(() => {
+    return window.location.pathname === "/";
+});
 const search = ref("");
 
 // constantly watch for changes in search field
@@ -44,9 +48,9 @@ const search = ref("");
 // re-rendering them with the new filtered data.
 // This allows for a dynamic and reactive user interface that responds to user input in real time.
 watch(search, () => {
-    console.log(`woooo`);
+    console.log(`woo`);
 
-    quizzes.value = q.filter(
+    quizzes.value = data.filter(
         // This is a callback function used as an argument
         // to the filter() method. It takes an argument quiz,
         // which represents a single object in the q array.
@@ -62,28 +66,23 @@ watch(search, () => {
 });
 </script>
 <template>
-    <!--  RouterView - Render page content based on route (path)-->
-    <RouterView />
     <div class="container">
-        <!--      {{q}}-->
         <header>
             <div>
                 <h1>Quiz App</h1>
-                <span class="mt-3 text-18px text-gray-50"> Our Quiz has {{ q.length }} categories to choose from </span>
+                <span class="mt-3 text-18px text-gray-50">
+                    Our Quiz has {{ data.length }} categories to choose from
+                </span>
             </div>
 
-          <div>
-            <!--  use v-model to add two way binding with default value Empty string from previously declared variable -->
-            <input v-model="search" type="text" placeholder="Search for Quiz.." />
-            <Navigation />
-          </div>
-
+            <div>
+                <!--  use v-model to add two way binding with default value Empty string from previously declared variable -->
+                <input v-if="isRootUrl" v-model="search" type="text" placeholder="Search for Quiz.." />
+                <Navigation />
+            </div>
         </header>
-
-        <!--      Cards container-->
-        <div class="options-container">
-            <Card v-for="quiz in quizzes" :key="quiz.id" :quiz="quiz" />
-        </div>
+        <!--  RouterView - Render page content based on route (path)-->
+        <RouterView />
     </div>
 </template>
 
