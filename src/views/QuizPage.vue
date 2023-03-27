@@ -26,12 +26,11 @@ const questionIndex = ref(0);
 //     }
 // );
 
-const questionProgress = computed(() => {
-    return `${questionIndex.value}/${quiz.questions.length}`;
-});
+const questionProgress = computed(() => `${questionIndex.value}/${quiz.questions.length}`);
 
 const progressBar = computed(() => {
-    // return string
+    // listen for changes of "questionIndex.value" or/and "quiz.questions.length", convert and return string
+    console.log(`${(questionIndex.value / quiz.questions.length) * 100}%`);
     return `${(questionIndex.value / quiz.questions.length) * 100}%`;
 });
 // show results component if quiz finished
@@ -62,14 +61,11 @@ const displayQuestions = () => {
 <template>
     <div v-if="quiz" class="border-amber-50 bg-blue-50 rounded-2xl px-8 py-5">
         <div>
-          <h1>
-            {{ progressBar }} {{ correctAnswers }}
-          
-        </h1>
+            <h1>{{ progressBar }} {{ correctAnswers }}</h1>
             <!--  <QuestionHeader />  -->
             <QuestionHeader v-if="!showResults" :questionProgress="questionProgress" :progressBar="progressBar" />
             <div>
-                <!--  set prop ":questionIndex" and pass index-->
+                <!--  set prop ":question" and pass index to display appropriate question   -->
                 <Question
                     v-if="!showResults"
                     @selectOption="onOptionSelected"
