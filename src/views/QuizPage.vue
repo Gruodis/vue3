@@ -63,7 +63,7 @@ const displayQuestions = () => {
         <div>
             <h1>{{ progressBar }} {{ correctAnswers }}</h1>
             <!--  <QuestionHeader />  -->
-            <QuestionHeader v-if="!showResults" :questionProgress="questionProgress" :progressBar="progressBar" />
+            <QuestionHeader v-if="!showResults" :questionProgressX="questionProgress" :progressBarX="progressBar" />
             <div>
                 <!--  set prop ":question" and pass index to display appropriate question   -->
                 <Question
@@ -73,6 +73,10 @@ const displayQuestions = () => {
                 />
                 <QuizResults v-else :totalQuestions="quiz.questions.length" :quizResults="correctAnswers" />
             </div>
+            <div class="flex justify-center">
+                <RouterLink to="/" class="p-2 m-5 border border-black flex hover:bg-black hover:text-gray-50">Go Back</RouterLink>
+            </div>
+
             <button @click="questionIndex++">nexxts</button>
         </div>
         <!--  on click update url to show question  -->

@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps, toRefs, watch } from "vue";
 
-const props = defineProps(["questionProgress", "progressBar"]);
+const props = defineProps(["questionProgressX", "progressBarX"]);
 
 // you need toRefs() if you want to destruct properly without loosing reactivity
 // const { questionProgress, progressBar } = toRefs(props);
@@ -16,9 +16,9 @@ watch(
 </script>
 <template>
     <header class="text-center py-5 text-5xl text-amber-300">
-        <h4>{{ questionProgress }}</h4>
+        <h4>{{ questionProgressX }}</h4>
         <div class="bar">
-            <div class="progress" :style="{ width: progressBar }"></div>
+            <div class="progress" :style="{ width: progressBarX }"></div>
         </div>
     </header>
 </template>
